@@ -1,4 +1,7 @@
 {
+  "name": "@desertthunder/cli",
+  "version": "0.1.0",
+  "exports": "./src/mod.ts",
   "license": "CC-BY-4.0",
   "tasks": {
     "dev": "deno run --watch example.ts"
@@ -24,6 +27,14 @@
     ],
     "exclude": [
       "src/fixtures/**/*.ts"
+    ]
+  },
+  "publish": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/**/*.test.ts"
     ]
   },
   "lint": {

@@ -1,6 +1,7 @@
 import { parseArgs } from "jsr:@std/cli";
 import { repeatChar } from "$utils";
 
+/** Flag is a wrapper around parsed flag attributes for a command. */
 export class Flag {
   constructor(
     /** Named type of the flag */
@@ -19,6 +20,10 @@ export class Flag {
   }
 }
 
+/**
+ * createSubCommandMap is a helper function that maps command
+ * names to actions.
+ */
 export function createSubCommandMap(cmds: Command[]) {
   const m = new Map<string, Command>();
 
@@ -29,6 +34,10 @@ export function createSubCommandMap(cmds: Command[]) {
   return m;
 }
 
+/**
+ * Command encapsulates common cli command attributes and defines
+ * the public interface of a command.
+ */
 export class Command {
   private map: Map<string, Command>;
 
