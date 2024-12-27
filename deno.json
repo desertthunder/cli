@@ -31,7 +31,10 @@
   },
   "publish": {
     "include": [
-      "src/**/*.ts"
+      "src/**/*.ts",
+      "example.ts",
+      "README.md",
+      "LICENSE"
     ],
     "exclude": [
       "src/**/*.test.ts"
