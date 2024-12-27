@@ -1,24 +1,5 @@
 import { parseArgs } from "jsr:@std/cli";
-
-/**
- * Create a range iterator from start to end
- */
-export function range(start: number, end: number) {
-  return Array.from({ length: end - start }, (_, i) => i);
-}
-
-/**
- * Repeat character, ch, n times. Defaults to 2.
- */
-export function repeatChar(ch: string, n: number = 2): string {
-  let repeated = ch;
-
-  for (const _ of range(0, n - 1)) {
-    repeated += ch;
-  }
-
-  return repeated;
-}
+import { repeatChar } from "$utils";
 
 export class Flag {
   constructor(
@@ -36,6 +17,16 @@ export class Flag {
   get usageText() {
     return (this.required ? " (required)  " : "") + `${this.usage}`;
   }
+}
+
+export function createSubCommandMap(cmds: Command[]) {
+  const m = new Map<string, Command>();
+
+  for (const cmd of cmds) {
+    m.set(cmd.name, cmd);
+  }
+
+  return m;
 }
 
 export class Command {
@@ -57,17 +48,7 @@ export class Command {
       this.copyright = this.defaultCopyright();
     }
 
-    this.map = Command.subCommandMap(this.commands);
-  }
-
-  static subCommandMap(cmds: Command[]) {
-    const m = new Map<string, Command>();
-
-    for (const cmd of cmds) {
-      m.set(cmd.name, cmd);
-    }
-
-    return m;
+    this.map = createSubCommandMap(this.commands);
   }
 
   private defaultCopyright(year?: number): string {
@@ -91,7 +72,9 @@ export class Command {
    * takes the longest named command, and makes sure that each
    * command name takes up the same horizontal space.
    */
-  static commandTextHelper(cmds: Command[]): string {
+  private get formattedCommandText(): string {
+    const cmds = this.commands;
+
     const lines: string[] = [];
 
     const maxLength = Math.max(...cmds.map((cmd) => cmd.name.length));
@@ -112,7 +95,11 @@ export class Command {
     return lines.join("\n");
   }
 
-  static flagTextHelper(flags: Flag[]): string {
+  /**
+   * Formats the usage text for each flag
+   */
+  private get formattedFlagText(): string {
+    const flags = this.flags;
     const lines: string[] = [];
 
     const maxLength = Math.max(...flags.map((flg) => flg.name.length));
@@ -146,8 +133,8 @@ export class Command {
 
     let text = this.usageLine;
 
-    const commandLines = Command.commandTextHelper(this.commands);
-    const optionLines = Command.flagTextHelper(this.flags);
+    const commandLines = this.formattedCommandText;
+    const optionLines = this.formattedFlagText;
 
     if (commandLines.length > 0) {
       text += `\n\nCommands:
@@ -187,52 +174,6 @@ ${optionLines}
     }
 
     return command.action(parsed);
-  }
-
-  public static create(
-    name: string,
-    usage: string,
-    action: (args?: Record<string, any>) => void,
-    subCommands: Command[] = [],
-    flags: Flag[] = [],
-    aliases?: string[],
-    usageText?: string
-  ): Command {
-    return new Command(
-      name,
-      usage,
-      action,
-      flags,
-      aliases,
-      subCommands,
-      [],
-      false,
-      usageText
-    );
-  }
-
-  public static createApplication(
-    name: string,
-    usage: string,
-    subCommands: Command[] = [],
-    flags: Flag[] = [],
-    usageText?: string,
-    copyright?: string
-  ): Command {
-    return new Command(
-      name,
-      usage,
-      function (_) {
-        throw new Error("Root command has no action");
-      },
-      flags,
-      [],
-      subCommands,
-      [],
-      true,
-      usageText,
-      copyright
-    );
   }
 
   public addFlags(flag: Flag) {

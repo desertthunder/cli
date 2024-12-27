@@ -1,5 +1,5 @@
 import { assertEquals, assertExists, assertInstanceOf } from "jsr:@std/assert";
-import { range, repeatChar } from "$cli";
+import { range, repeatChar } from "$utils";
 import { sample } from "jsr:@std/collections";
 
 Deno.test("function range creates an array of length n", function () {

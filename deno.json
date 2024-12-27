@@ -1,11 +1,13 @@
 {
   "license": "CC-BY-4.0",
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "dev": "deno run --watch example.ts"
   },
   "imports": {
     "$cli": "./src/cli/index.ts",
     "$libs": "./src/libs/index.ts",
+    "$utils": "./src/libs/utils/index.ts",
+    "$helpers": "./src/helpers/index.ts",
     "@std/assert": "jsr:@std/assert@^1.0.10",
     "@std/cli": "jsr:@std/cli@^1.0.9",
     "@std/log": "jsr:@std/log@^0.224.12"
