@@ -1,4 +1,4 @@
-import { parseArgs } from "jsr:@std/cli";
+import { parseArgs } from "jsr:@std/cli@1.0.9";
 import { repeatChar } from "$utils";
 
 /** Flag is a wrapper around parsed flag attributes for a command. */
@@ -15,7 +15,11 @@ export class Flag {
     return `<${this.type}>` + repeatChar(" ", n + 2);
   }
 
-  get usageText() {
+  /**
+   * usageText is a getter that generates formatted usage text for
+   * a flag.
+   */
+  get usageText(): string {
     return (this.required ? " (required)  " : "") + `${this.usage}`;
   }
 }
@@ -164,11 +168,13 @@ ${optionLines}
     console.log(text);
   }
 
-  public printHelp() {
+  /** printHelp prints the help text to the stdout stream */
+  public printHelp(): void {
     this.print(this.help);
   }
 
-  public run(args: string[]) {
+  /** run executes the root command using parsed arguments */
+  public run(args: string[]): void {
     const parsed = parseArgs(args, {
       boolean: ["help"],
       string: ["name", "type"],
