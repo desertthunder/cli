@@ -227,8 +227,14 @@ export enum TimeFormat {
     TimeOnly = 'TimeOnly',
 }
 
+/**
+ * A TimeFormatterFn takes a date object and formats it. Pass a boolean
+ * to ensure that the formatters use UTC values.
+ */
+export type TimeFormatterFn = (date: Date, utc: boolean) => string;
+
 /** Pattern matching function for TimeFormat to Formatter function */
-export function getFormatter(format: TimeFormat) {
+export function getFormatter(format: TimeFormat): TimeFormatterFn {
     switch (format) {
         case TimeFormat.Layout:
             return TimeFormatters.Layout;
