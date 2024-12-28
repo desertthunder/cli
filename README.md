@@ -77,7 +77,16 @@ if (import.meta.main) {
 
 ```typescript
 console.log(colorizeText("This is red text", TerminalTextColor.RED));
+console.log(
+  colorizeText('This is (bright) cyan text', TerminalTextColor.BRIGHT_CYAN),
+);
+
+// See src/libs/logger/colors.ts for the full code block of examples.
+// Run deno run src/libs/logger/colors.ts the see the examples with your
+// terminal emulator's color scheme
 ```
+
+![colors in stdout](./assets/colors.png)
 
 ## Runtime Compatibility
 

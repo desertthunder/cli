@@ -92,21 +92,19 @@ export function colorizeBg(
  */
 export function formatTextWithColorsAndPadding(
     text: string,
-    fgColor: TerminalTextColor,
     bgColor: TerminalBackgroundColor,
+    fgColor: TerminalTextColor,
     spacing: Spacing = DEFAULT_SPACING,
 ): string {
-    let paddedText = `${fgColor}${text}${RESET_COLOR}`;
-
     const rightPad = ' '.repeat(spacing.padding?.r ?? 0);
     const leftPad = ' '.repeat(spacing.padding?.l ?? 0);
 
-    paddedText = `${leftPad}${paddedText}${rightPad}`;
+    const paddedText = `${bgColor}${leftPad}${text}${rightPad}`;
 
     const rightMargin = ' '.repeat(spacing.margin?.r ?? 0);
     const leftMargin = ' '.repeat(spacing.margin?.l ?? 0);
 
-    return `${leftMargin}${bgColor}${paddedText}${RESET_COLOR}${rightMargin}`;
+    return `${leftMargin}${fgColor}${paddedText}${RESET_COLOR}${rightMargin}`;
 }
 
 // deno run src/libs/logger/colors.ts
@@ -135,8 +133,8 @@ function example() {
     console.log(
         formatTextWithColorsAndPadding(
             'Stylized Text',
+            TerminalBackgroundColor.BG_BRIGHT_BLUE,
             TerminalTextColor.WHITE,
-            TerminalBackgroundColor.BG_BLUE,
             {
                 padding: {
                     l: 4,
@@ -149,8 +147,8 @@ function example() {
     console.log(
         formatTextWithColorsAndPadding(
             'Error',
-            TerminalTextColor.BRIGHT_RED,
             TerminalBackgroundColor.BG_BRIGHT_WHITE,
+            TerminalTextColor.BRIGHT_RED,
             {
                 padding: {
                     l: 5,
