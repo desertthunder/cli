@@ -10,11 +10,54 @@ interface to build your applications.
 
 ## Installation
 
+This package is hosted on the JSR. To install it in your project, run:
+
 ```bash
 deno add jsr:@desertthunder/cli
 ```
 
 ## Examples
+
+### Creating an Application
+
+The fastest way to get started is to import the helper functions. These are
+simple wrappers around the constructor for the Command class. Make note of the
+Metadata type when defining the attributes and interface of your application.
+
+```typescript
+import { createApplication, createCommand, Flags } from "jsr:@desertthunder/cli";
+
+// Define flags for your command (optional)
+const flags = [
+  new Flag('string', 'name', 'name of something', true),
+  new Flag('string', 'type', 'type of something', true),
+];
+
+// Define an action to call when your command is run.
+function exampleAction(args?: Record<string, any>) {
+  if (!args) {
+    console.log("No args passed!");
+    return;
+  }
+
+  console.log(JSON.stringify(args, null, 2));
+},
+
+// Define metadata for your command
+const exampleCommand = createCommand(
+  { name: 'command', usage: 'do something' }, action, flags
+)
+
+// Create a root command
+const root = createApplication(
+  { name: 'application', usage: '' }, [exampleCommand]
+);
+
+// if __name__ == '__main__' ?
+if (import.meta.main) {
+  root.run(Deno.args);
+}
+```
 
 ### Logger
 
@@ -34,7 +77,6 @@ if (import.meta.main) {
 
 ```typescript
 console.log(colorizeText("This is red text", TerminalTextColor.RED));
-
 ```
 
 ## Runtime Compatibility
@@ -45,12 +87,10 @@ console.log(colorizeText("This is red text", TerminalTextColor.RED));
 
 ## Inspiration
 
-Charm's [log](https://github.com/charmbracelet/log) library
-
-Urfave's [cli](https://github.com/urfave/cli) V2 & V3
+- Charm's [log](https://github.com/charmbracelet/log) library
+- Urfave's [cli](https://github.com/urfave/cli) V2 & V3
 
 ## License
 
-Copyright 2024 Owais J (mailto:desertthunder.dev@gmail.com)
-
-SPDX-License-Identifier: [CC BY-NC-ND](/LICENSE)
+Copyright 2024 Owais J (mailto:desertthunder.dev@gmail.com). See [`LICENSE`](./LICENSE)
+for more information.

@@ -7,3 +7,6 @@
 - [ ] Add module docs (`@module`) for every module
 - [ ] Tests for implementation
 - [ ] Examples in jsdoc & `README`
+- [ ] Example calculator project
+- [ ] Completions for bash
+- [ ] Zsh completions

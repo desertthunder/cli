@@ -1,6 +1,6 @@
 {
   "name": "@desertthunder/cli",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "exports": "./src/mod.ts",
   "license": "CC-BY-4.0",
   "tasks": {
@@ -25,7 +25,8 @@
     "singleQuote": true,
     "proseWrap": "preserve",
     "include": [
-      "src/"
+      "src/",
+      "example.ts"
     ],
     "exclude": [
       "src/fixtures/**/*.ts"

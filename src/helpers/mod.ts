@@ -1,49 +1,38 @@
-import { Command, Flag } from '$cli';
+import { Command, type CommandAction, type CommandMeta, Flag } from '$cli';
 
 /** Root command/Command object creation helper */
 export function createApplication(
-    name: string,
-    usage: string,
+    metadata: CommandMeta,
     subCommands: Command[] = [],
     flags: Flag[] = [],
-    usageText?: string,
-    copyright?: string,
+    action: CommandAction = function (_) {
+        console.log('Default action');
+    },
 ): Command {
     return new Command(
-        name,
-        usage,
-        function (_) {
-            throw new Error('Root command has no action');
-        },
+        metadata,
+        action,
         flags,
         [],
         subCommands,
-        [],
         true,
-        usageText,
-        copyright,
     );
 }
 
 /** Command object creation helper */
 export function createCommand(
-    name: string,
-    usage: string,
+    metadata: CommandMeta,
     action: (args?: Record<string, any>) => void,
     subCommands: Command[] = [],
     flags: Flag[] = [],
     aliases?: string[],
-    usageText?: string,
 ): Command {
     return new Command(
-        name,
-        usage,
+        metadata,
         action,
         flags,
         aliases,
         subCommands,
-        [],
         false,
-        usageText,
     );
 }
