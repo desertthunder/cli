@@ -1,3 +1,4 @@
-export * as CLI from './cli/mod.ts';
-export * as Helpers from './helpers/mod.ts';
+export * as CLI from '$cli';
+export * as Helpers from '$helpers';
+export * as DateTime from '$datetime';
 export { Colors, Logging } from '$logger';

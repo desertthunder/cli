@@ -1,262 +1,205 @@
+import { dateValues, formatTZOffset, monthStr, padNum, tzStr } from './helpers.ts';
+
 export class TimeFormatters {
-    private static pad(value: number, length: number = 2): string {
-        return value.toString().padStart(length, '0');
-    }
+    public static Layout(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
 
-    private static formatTimezoneOffset(date: Date): string {
-        const offset = date.getTimezoneOffset();
-        const sign = offset > 0 ? '-' : '+';
-        const hours = TimeFormatters.pad(Math.abs(Math.floor(offset / 60)));
-        const minutes = TimeFormatters.pad(Math.abs(offset % 60));
-        return `${sign}${hours}${minutes}`;
-    }
-
-    public static Layout(date: Date): string {
-        return `${TimeFormatters.pad(date.getMonth() + 1)}/${
-            TimeFormatters.pad(
-                date.getDate(),
-            )
-        } ${TimeFormatters.pad(date.getHours() % 12 || 12)}:${
-            TimeFormatters.pad(
-                date.getMinutes(),
-            )
-        }:${TimeFormatters.pad(date.getSeconds())}${date.getHours() >= 12 ? 'PM' : 'AM'} '${
-            date
-                .getFullYear()
+        return `${padNum(values.month + 1)}/${padNum(values.date)} ${
+            padNum(values.hours % 12 || 12)
+        }:${padNum(values.minutes)}:${padNum(values.seconds)}${values.hours >= 12 ? 'PM' : 'AM'} '${
+            values.fullYear
                 .toString()
                 .slice(-2)
-        } ${TimeFormatters.formatTimezoneOffset(date)}`;
+        } ${formatTZOffset(date, utc)}`;
     }
 
-    public static ANSIC(date: Date): string {
-        const day = date.toString().slice(0, 3);
-        const month = date.toString().slice(4, 7);
-        const dayOfMonth = TimeFormatters.pad(date.getDate());
-        const time = `${TimeFormatters.pad(date.getHours())}:${
-            TimeFormatters.pad(
-                date.getMinutes(),
-            )
-        }:${TimeFormatters.pad(date.getSeconds())}`;
-        const year = date.getFullYear();
+    public static ANSIC(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+        const day = (utc ? date.toUTCString() : date.toString()).slice(0, 3);
+        const month = monthStr(values.month).slice(0, 3);
+        const dayOfMonth = padNum(values.date);
+        const time = `${padNum(values.hours)}:${padNum(values.minutes)}:${padNum(values.seconds)}`;
+        const year = values.fullYear;
         return `${day} ${month} ${dayOfMonth} ${time} ${year}`;
     }
 
-    public static UnixDate(date: Date): string {
-        const day = date.toString().slice(0, 3);
-        const month = date.toString().slice(4, 7);
-        const dayOfMonth = TimeFormatters.pad(date.getDate());
-        const time = `${TimeFormatters.pad(date.getHours())}:${
-            TimeFormatters.pad(
-                date.getMinutes(),
-            )
-        }:${TimeFormatters.pad(date.getSeconds())}`;
-        const timezone = date.toString().match(/\(([^)]+)\)$/)?.[1] ?? '';
-        const year = date.getFullYear();
+    public static UnixDate(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+        const day = (utc ? date.toUTCString() : date.toString()).slice(0, 3);
+        const month = monthStr(values.month).slice(0, 3);
+        const dayOfMonth = padNum(values.date);
+        const time = `${padNum(values.hours)}:${padNum(values.minutes)}:${padNum(values.seconds)}`;
+        const timezone = tzStr(date, utc);
+        const year = values.fullYear;
         return `${day} ${month} ${dayOfMonth} ${time} ${timezone} ${year}`;
     }
 
-    public static RubyDate(date: Date): string {
-        const day = date.toString().slice(0, 3);
-        const month = date.toString().slice(4, 7);
-        const dayOfMonth = TimeFormatters.pad(date.getDate());
-        const time = `${TimeFormatters.pad(date.getHours())}:${
-            TimeFormatters.pad(
-                date.getMinutes(),
-            )
-        }:${TimeFormatters.pad(date.getSeconds())}`;
-        const year = date.getFullYear();
-        return `${day} ${month} ${dayOfMonth} ${time} ${
-            TimeFormatters.formatTimezoneOffset(
-                date,
-            )
-        } ${year}`;
+    public static RubyDate(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+        const day = (utc ? date.toUTCString() : date.toString()).slice(0, 3);
+        const month = monthStr(values.month).slice(0, 3);
+        const dayOfMonth = padNum(values.date);
+        const time = `${padNum(values.hours)}:${padNum(values.minutes)}:${padNum(values.seconds)}`;
+        const year = values.fullYear;
+
+        return `${day} ${month} ${dayOfMonth} ${time} ${formatTZOffset(date, utc)} ${year}`;
     }
 
-    public static RFC822(date: Date): string {
-        const day = TimeFormatters.pad(date.getDate());
-        const month = date.toString().slice(4, 7);
-        const year = date.getFullYear().toString().slice(-2);
-        const time = `${TimeFormatters.pad(date.getHours())}:${
-            TimeFormatters.pad(
-                date.getMinutes(),
-            )
-        }`;
-        const timezone = date.toString().match(/\(([^)]+)\)$/)?.[1] ?? '';
+    public static RFC822(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const day = padNum(values.date);
+        const month = monthStr(values.month).slice(0, 3);
+        const year = values.fullYear.toString().slice(-2);
+        const time = `${padNum(values.hours)}:${padNum(values.minutes)}`;
+        const timezone = utc ? 'GMT' : (date.toString()).match(/\(([^)]+)\)$/)?.[1] ??
+            '';
         return `${day} ${month} ${year} ${time} ${timezone}`;
     }
 
-    public static RFC822Z(date: Date): string {
-        const day = TimeFormatters.pad(date.getDate());
-        const month = date.toString().slice(4, 7);
-        const year = date.getFullYear().toString().slice(-2);
-        const time = `${TimeFormatters.pad(date.getHours())}:${
-            TimeFormatters.pad(
-                date.getMinutes(),
-            )
-        }`;
-        return `${day} ${month} ${year} ${time} ${
-            TimeFormatters.formatTimezoneOffset(
-                date,
-            )
-        }`;
+    public static RFC822Z(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const day = padNum(values.date);
+        const month = monthStr(values.month).slice(0, 3);
+        const year = values.fullYear.toString().slice(-2);
+        const time = `${padNum(values.hours)}:${padNum(values.minutes)}`;
+        return `${day} ${month} ${year} ${time} ${formatTZOffset(date, utc)}`;
     }
 
-    public static RFC850(date: Date): string {
-        const day = date.toString().slice(0, 3);
-        const month = date.toString().slice(4, 7);
-        const dayOfMonth = TimeFormatters.pad(date.getDate());
-        const time = `${TimeFormatters.pad(date.getHours())}:${
-            TimeFormatters.pad(
-                date.getMinutes(),
-            )
-        }:${TimeFormatters.pad(date.getSeconds())}`;
-        const year = date.getFullYear();
-        const timezone = date.toString().match(/\(([^)]+)\)$/)?.[1] ?? '';
+    public static RFC850(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const day = (utc ? date.toUTCString() : date.toString()).slice(0, 3);
+        const month = monthStr(values.month).slice(0, 3);
+        const dayOfMonth = padNum(values.date);
+        const time = `${padNum(values.hours)}:${padNum(values.minutes)}:${padNum(values.seconds)}`;
+        const year = values.fullYear;
+        const timezone = tzStr(date, utc);
+
         return `${day}, ${dayOfMonth}-${month}-${year} ${time} ${timezone}`;
     }
 
-    public static RFC1123(date: Date): string {
-        const day = date.toString().slice(0, 3);
-        const month = date.toString().slice(4, 7);
-        const dayOfMonth = TimeFormatters.pad(date.getDate());
-        const time = `${TimeFormatters.pad(date.getHours())}:${
-            TimeFormatters.pad(
-                date.getMinutes(),
-            )
-        }:${TimeFormatters.pad(date.getSeconds())}`;
-        const year = date.getFullYear();
-        const timezone = date.toString().match(/\(([^)]+)\)$/)?.[1] ?? '';
+    public static RFC1123(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const day = (utc ? date.toUTCString() : date.toString()).slice(0, 3);
+        const month = monthStr(values.month).slice(0, 3);
+        const dayOfMonth = padNum(values.date);
+        const time = `${padNum(values.hours)}:${padNum(values.minutes)}:${padNum(values.seconds)}`;
+        const year = values.fullYear;
+        const timezone = tzStr(date, utc);
+
         return `${day}, ${dayOfMonth} ${month} ${year} ${time} ${timezone}`;
     }
 
-    public static RFC1123Z(date: Date): string {
-        const day = date.toString().slice(0, 3);
-        const month = date.toString().slice(4, 7);
-        const dayOfMonth = TimeFormatters.pad(date.getDate());
-        const time = `${TimeFormatters.pad(date.getHours())}:${
-            TimeFormatters.pad(
-                date.getMinutes(),
+    public static RFC1123Z(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const day = (utc ? date.toUTCString() : date.toString()).slice(0, 3);
+        const month = monthStr(values.month).slice(0, 3);
+        const dayOfMonth = padNum(values.date);
+        const time = `${padNum(values.hours)}:${
+            padNum(
+                values.minutes,
             )
-        }:${TimeFormatters.pad(date.getSeconds())}`;
-        const year = date.getFullYear();
-        return `${day}, ${dayOfMonth} ${month} ${year} ${time} ${
-            TimeFormatters.formatTimezoneOffset(
-                date,
-            )
-        }`;
+        }:${padNum(values.seconds)}`;
+        const year = values.fullYear;
+
+        return `${day}, ${dayOfMonth} ${month} ${year} ${time} ${formatTZOffset(date, utc)}`;
     }
 
-    public static RFC3339(date: Date): string {
-        const datePart = `${date.getFullYear()}-${
-            TimeFormatters.pad(
-                date.getMonth() + 1,
-            )
-        }-${TimeFormatters.pad(date.getDate())}`;
-        const timePart = `${
-            TimeFormatters.pad(
-                date.getHours(),
-            )
-        }:${TimeFormatters.pad(date.getMinutes())}:${
-            TimeFormatters.pad(
-                date.getSeconds(),
-            )
+    public static RFC3339(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const datePart = `${values.fullYear}-${padNum(values.month + 1)}-${padNum(values.date)}`;
+        const timePart = `${padNum(values.hours)}:${padNum(values.minutes)}:${
+            padNum(values.seconds)
         }`;
-        const timezone = TimeFormatters.formatTimezoneOffset(date);
+        const timezone = formatTZOffset(date, utc);
         return `${datePart}T${timePart}${timezone}`;
     }
 
-    public static RFC3339Nano(date: Date): string {
-        const datePart = `${date.getFullYear()}-${
-            TimeFormatters.pad(
-                date.getMonth() + 1,
-            )
-        }-${TimeFormatters.pad(date.getDate())}`;
-        const timePart = `${
-            TimeFormatters.pad(
-                date.getHours(),
-            )
-        }:${TimeFormatters.pad(date.getMinutes())}:${
-            TimeFormatters.pad(
-                date.getSeconds(),
-            )
+    public static RFC3339Nano(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const datePart = `${values.fullYear}-${padNum(values.month + 1)}-${padNum(values.date)}`;
+        const timePart = `${padNum(values.hours)}:${padNum(values.minutes)}:${
+            padNum(values.seconds)
         }`;
-        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-        const timezone = TimeFormatters.formatTimezoneOffset(date);
+        const milliseconds = values.milliseconds.toString().padStart(3, '0');
+        const timezone = formatTZOffset(date, utc);
+
         return `${datePart}T${timePart}.${milliseconds}Z${timezone}`;
     }
 
-    public static Kitchen(date: Date): string {
-        const hours = date.getHours() % 12 || 12;
-        const minutes = TimeFormatters.pad(date.getMinutes());
-        const period = date.getHours() >= 12 ? 'PM' : 'AM';
+    public static Kitchen(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const hours = values.hours % 12 || 12;
+        const minutes = padNum(values.minutes);
+        const period = values.hours >= 12 ? 'PM' : 'AM';
         return `${hours}:${minutes}${period}`;
     }
 
-    public static Stamp(date: Date): string {
-        const month = date.toString().slice(4, 7);
-        const day = TimeFormatters.pad(date.getDate());
-        const time = `${TimeFormatters.pad(date.getHours())}:${
-            TimeFormatters.pad(
-                date.getMinutes(),
-            )
-        }:${TimeFormatters.pad(date.getSeconds())}`;
+    public static Stamp(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const month = monthStr(values.month).slice(0, 3);
+        const day = padNum(values.date);
+        const time = `${padNum(values.hours)}:${padNum(values.minutes)}:${padNum(values.seconds)}`;
         return `${month} ${day} ${time}`;
     }
 
-    public static StampMilli(date: Date): string {
-        const stamp = TimeFormatters.Stamp(date);
-        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+    public static StampMilli(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const stamp = TimeFormatters.Stamp(date, utc);
+        const milliseconds = values.milliseconds.toString().padStart(3, '0');
         return `${stamp}.${milliseconds}`;
     }
 
-    public static StampMicro(date: Date): string {
-        const stamp = TimeFormatters.Stamp(date);
-        const microseconds = (date.getMilliseconds() * 1000)
+    public static StampMicro(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const stamp = TimeFormatters.Stamp(date, utc);
+        const microseconds = (values.milliseconds * 1000)
             .toString()
             .padStart(6, '0');
         return `${stamp}.${microseconds}`;
     }
 
-    public static StampNano(date: Date): string {
-        const stamp = TimeFormatters.Stamp(date);
-        const nanoseconds = (date.getMilliseconds() * 1000000)
+    public static StampNano(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const stamp = TimeFormatters.Stamp(date, utc);
+        const nanoseconds = (values.milliseconds * 1000000)
             .toString()
             .padStart(9, '0');
         return `${stamp}.${nanoseconds}`;
     }
 
-    public static DateTime(date: Date): string {
-        const datePart = `${date.getFullYear()}-${
-            TimeFormatters.pad(
-                date.getMonth() + 1,
-            )
-        }-${TimeFormatters.pad(date.getDate())}`;
-        const timePart = `${
-            TimeFormatters.pad(
-                date.getHours(),
-            )
-        }:${TimeFormatters.pad(date.getMinutes())}:${
-            TimeFormatters.pad(
-                date.getSeconds(),
-            )
+    public static DateTime(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        const datePart = `${values.fullYear}-${padNum(values.month + 1)}-${padNum(values.date)}`;
+        const timePart = `${padNum(values.hours)}:${padNum(values.minutes)}:${
+            padNum(values.seconds)
         }`;
+
         return `${datePart} ${timePart}`;
     }
 
-    public static DateOnly(date: Date): string {
-        return `${date.getFullYear()}-${
-            TimeFormatters.pad(
-                date.getMonth() + 1,
-            )
-        }-${TimeFormatters.pad(date.getDate())}`;
+    public static DateOnly(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        return `${values.fullYear}-${padNum(values.month + 1)}-${padNum(values.date)}`;
     }
 
-    public static TimeOnly(date: Date): string {
-        return `${TimeFormatters.pad(date.getHours())}:${
-            TimeFormatters.pad(
-                date.getMinutes(),
-            )
-        }:${TimeFormatters.pad(date.getSeconds())}`;
+    public static TimeOnly(date: Date, utc: boolean): string {
+        const values = dateValues(date, utc);
+
+        return `${padNum(values.hours)}:${padNum(values.minutes)}:${padNum(values.seconds)}`;
     }
 }
 
@@ -330,7 +273,8 @@ function getFormatter(format: TimeFormat) {
 export function formatDate(
     date: Date = new Date(),
     format: TimeFormat = TimeFormat.RFC822Z,
+    utc: boolean = false,
 ): string {
     const fn = getFormatter(format);
-    return fn(date);
+    return fn(date, utc);
 }
