@@ -59,6 +59,7 @@ export type Spacing = {
     };
 };
 
+/** DEFAULT_SPACING is no margins or padding */
 export const DEFAULT_SPACING: Spacing = {
     padding: { l: 0, r: 0 },
     margin: { l: 0, r: 0 },

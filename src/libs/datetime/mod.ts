@@ -1,5 +1,6 @@
 import { dateValues, formatTZOffset, monthStr, padNum, tzStr } from './helpers.ts';
 
+/** TimeFormatters is a collection of static methods to format Date objects */
 export class TimeFormatters {
     public static Layout(date: Date, utc: boolean): string {
         const values = dateValues(date, utc);
@@ -203,6 +204,7 @@ export class TimeFormatters {
     }
 }
 
+/** Enumeration of available formats */
 export enum TimeFormat {
     Layout = 'Layout',
     ANSIC = 'ANSIC',
@@ -225,7 +227,8 @@ export enum TimeFormat {
     TimeOnly = 'TimeOnly',
 }
 
-function getFormatter(format: TimeFormat) {
+/** Pattern matching function for TimeFormat to Formatter function */
+export function getFormatter(format: TimeFormat) {
     switch (format) {
         case TimeFormat.Layout:
             return TimeFormatters.Layout;
@@ -270,6 +273,9 @@ function getFormatter(format: TimeFormat) {
     }
 }
 
+/**
+ * Helper/Utility method that takes a date and options to format based on the
+ * provided layout */
 export function formatDate(
     date: Date = new Date(),
     format: TimeFormat = TimeFormat.RFC822Z,

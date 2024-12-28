@@ -8,6 +8,7 @@
 import * as log from 'jsr:@std/log@0.224.12';
 import { formatDate } from '$datetime';
 
+/** Logger configuration options with an optional level */
 export type Options = {
     colors: boolean;
     level?: log.LevelName;
@@ -16,11 +17,16 @@ export type Options = {
     formatter: log.FormatterFunction;
 };
 
+/** Defines configuration options for a file and stdout/console handler */
 export type HandlerConfig = {
     file?: log.FileHandler;
     console?: log.ConsoleHandler;
 };
 
+/**
+ * DEFAULT_LOGGER_CONFIG is an Options object that prints
+ * colored logs at a level at or above "INFO" with colors.
+ */
 export const DEFAULT_LOGGER_CONFIG: Options = {
     colors: true,
     level: 'INFO',
@@ -38,7 +44,8 @@ function formatterFn(mod: string, fn: log.FormatterFunction) {
 }
 
 /**
- * @description creates a logger instance from a provided module name
+ * createLogger creates a logger instance from a provided module name
+ *
  * @todo allow for the creation and injection of a custom formatter
  * @todo rotatable logger
  * @todo config timestamp
