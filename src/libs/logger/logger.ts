@@ -6,7 +6,7 @@
  */
 
 import * as log from 'jsr:@std/log@0.224.12';
-import { formatDate } from '../time.ts';
+import { formatDate } from '$datetime';
 
 export type Options = {
     colors: boolean;
